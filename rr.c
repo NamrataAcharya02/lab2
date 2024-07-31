@@ -25,6 +25,7 @@ struct process
   /*u32 waiting_time;*/
   u32 response_time;
   bool responded;
+  bool added;
 
   /* End of "Additional fields here" */
 };
@@ -179,6 +180,7 @@ int main(int argc, char *argv[])
     
     current_proc->burst_left = current_proc->burst_time;
     current_proc->responded = false;
+    current_proc->added = false;
 
   }
 
@@ -195,9 +197,10 @@ int main(int argc, char *argv[])
     for (u32 i = 0; i < size; i++)
     {
       struct process * proc = &data[i];
-      if (proc->arrival_time == current_time)
+      if (!proc->added && proc->arrival_time == current_time)
       {
         TAILQ_INSERT_TAIL(&list, proc, pointers);
+        proc->added = true;
       }
     }
     printf("Time: %d, q: %d, \n", current_time, quant);

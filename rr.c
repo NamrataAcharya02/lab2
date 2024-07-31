@@ -21,6 +21,10 @@ struct process
   TAILQ_ENTRY(process) pointers;
 
   /* Additional fields here */
+  u32 burst_left;
+  u32 waiting_time;
+  u32 response_time;
+
   /* End of "Additional fields here" */
 };
 
@@ -160,6 +164,73 @@ int main(int argc, char *argv[])
   u32 total_response_time = 0;
 
   /* Your code here */
+  u32 current_time = &data[0].arrival_time;
+
+  /* Set current time to first arrival time*/
+  for (u32 i = 0; i < size; i++)
+  {
+    if (&data[i].arrival_time < current_time)
+    {
+      current_time = &data[i].arrival_time;
+    }
+  }
+
+  bool done = false;
+  u32 quant = 1;
+  u32 size_left = size;
+
+  while (size_left > 0) {
+    /* check if current time = arrival time of any process*/
+    for (u32 i = 0; i < size; i++)
+    {
+      if (&data[i].arrival_time == current_time)
+      {
+        TAILQ_INSERT_TAIL(&list, &data[i], pointers);
+      }
+    }
+
+    /* check if quant <= quantum length*/
+    if (quant <= quantum_length)
+    {
+      /* check if left burst > 0*/
+      if (TAILQ_FIRST(&list)->burst_left > 0)
+      {
+        /* check if response time = 0*/
+        if (TAILQ_FIRST(&list)->response_time == 0)
+        {
+          TAILQ_FIRST(&list)->response_time = current_time - TAILQ_FIRST(&list)->arrival_time;
+        }
+        TAILQ_FIRST(&list)->burst_left--;
+        quant++;
+      } else {
+        /* remove first process and reset quant*/
+        total_waiting_time += current_time - TAILQ_FIRST(&list)->arrival_time - TAILQ_FIRST(&list)->burst_time + 1;
+        TAILQ_REMOVE(&list, TAILQ_FIRST(&list), pointers);
+        size_left--;
+        quant = 1;
+      }
+    } else {
+      /* remove first process and reset quant*/
+      if (TAILQ_FIRST(&list)->burst_left == 0)
+      {
+        total_waiting_time += current_time - TAILQ_FIRST(&list)->arrival_time - TAILQ_FIRST(&list)->burst_time + 1;
+
+        TAILQ_REMOVE(&list, TAILQ_FIRST(&list), pointers);
+        quant = 1;
+        size_left--;
+      } else {
+        struct process* temp = TAILQ_FIRST(&list);
+        TAILQ_REMOVE(&list, TAILQ_FIRST(&list), pointers);
+        TAILQ_INSERT_TAIL(&list, temp, pointers);
+        current_time --;
+        quant = 1;
+      }
+      
+    }
+    
+    current_time++;
+  }
+
   
   /* End of "Your code here" */
 

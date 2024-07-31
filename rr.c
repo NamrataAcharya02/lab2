@@ -187,8 +187,8 @@ int main(int argc, char *argv[])
   bool done = false;
   u32 quant = 1;
   u32 size_left = size;
-  printf("starting loop. %d", current_time);
-
+  /*printf("starting loop. %d", current_time);
+*/
   while (size_left > 0) {
     struct process * p;
     
@@ -203,12 +203,12 @@ int main(int argc, char *argv[])
         proc->added = true;
       }
     }
-    printf("Time: %d, q: %d, \n", current_time, quant);
+    /*printf("Time: %d, q: %d, \n", current_time, quant);
 
     TAILQ_FOREACH(p, &list, pointers) {
       printf(" Queue is pid %d, left burst %d\n", p->pid, p->burst_left);
       printf("-----------------------------\n");
-    }
+    }*/
 
     /* check if quant <= quantum length*/
     if (quant <= quantum_length)
@@ -222,7 +222,8 @@ int main(int argc, char *argv[])
           TAILQ_FIRST(&list)->response_time = current_time - TAILQ_FIRST(&list)->arrival_time;
            TAILQ_FIRST(&list)->responded = true;
           
-          printf("response time for %d: %d",  TAILQ_FIRST(&list)->pid, TAILQ_FIRST(&list)->response_time);
+          /*printf("response time for %d: %d",  TAILQ_FIRST(&list)->pid, TAILQ_FIRST(&list)->response_time);
+        */
         }
         TAILQ_FIRST(&list)->burst_left--;
         quant++;
